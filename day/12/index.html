@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Day 12 — ABTalks</title>
+<link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+<div class="screen">
+
+  <div class="topbar">
+    <a href="../../dashboard/" class="arrow-btn" aria-label="Back to dashboard">←</a>
+    <nav class="desktop-nav">
+      <a href="../../dashboard/">Home</a>
+      <a href="./" class="active">Today</a>
+      <a href="../../ranks/">Ranks</a>
+      <a href="../../profile/">Profile</a>
+    </nav>
+    <div class="top-actions">
+      <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+      <div class="tier-chip" id="tierChip">Circuit tier</div>
+    </div>
+  </div>
+
+  <div class="day-hero">
+    <div class="nav-row">
+      <a href="#" class="arrow-btn disabled" aria-disabled="true" id="prevDayArrow" title="Previous day — already submitted">‹</a>
+      <span class="eyebrow" id="dayEyebrow">DAY 12 OF 60</span>
+      <a href="#" class="arrow-btn disabled" aria-disabled="true" title="Unlocks tomorrow">›</a>
+    </div>
+    <h1 id="dayTitle">Build a paginated API and wire it to a live list view</h1>
+    <div class="meta-row">
+      <span class="meta-tag">⏱ 60–90 min</span>
+      <span class="meta-tag">◆ Intermediate</span>
+      <span class="meta-tag">🖥️ Full-Stack Web</span>
+    </div>
+  </div>
+
+  <div class="brief-card">
+    <h4>Brief</h4>
+    <p id="briefText"></p>
+    <h4 style="margin-top:16px;">You'll need to ship</h4>
+    <ul id="reqList"></ul>
+    <div class="resource-row" id="resourceRow"></div>
+  </div>
+
+  <div class="stepper" id="submitStepper">
+    <div class="step-wrap active" data-step="1"><div class="step-dot active">1</div><span>GitHub</span></div>
+    <div class="step-line"></div>
+    <div class="step-wrap" data-step="2"><div class="step-dot">2</div><span>LinkedIn</span></div>
+    <div class="step-line"></div>
+    <div class="step-wrap" data-step="3"><div class="step-dot">3</div><span>Submit</span></div>
+  </div>
+
+  <div class="submit-card">
+    <h4>Submit today's proof</h4>
+    <p>Both links are required — a commit shows the work, a post shows the world. One at a time keeps it quick to check.</p>
+
+    <!-- Step 1: GitHub -->
+    <div class="sub-step active" id="subStep1">
+      <div class="field" id="fieldGh">
+        <label for="ghInput">GitHub commit or repo URL</label>
+        <div class="input-wrap">
+          <span class="ic">⌥</span>
+          <input id="ghInput" name="gh-commit-url" type="text" inputmode="url" placeholder="github.com/you/repo/commit/…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore />
+          <span class="check"></span>
+        </div>
+        <div class="hint">Paste the exact commit link for today's work.</div>
+      </div>
+      <button class="btn btn-primary" id="ghNext" disabled>Continue to LinkedIn</button>
+    </div>
+
+    <!-- Step 2: LinkedIn -->
+    <div class="sub-step" id="subStep2">
+      <div class="field" id="fieldLi">
+        <label for="liInput">LinkedIn post URL</label>
+        <div class="input-wrap">
+          <span class="ic">in</span>
+          <input id="liInput" name="li-post-url" type="text" inputmode="url" placeholder="linkedin.com/posts/…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore />
+          <span class="check"></span>
+        </div>
+        <div class="hint" id="liHint">Post about what you built and tag #ABTalksDay12.</div>
+      </div>
+      <div class="step-actions">
+        <button class="btn btn-secondary" id="liBack">Back</button>
+        <button class="btn btn-primary" id="liNext" disabled>Review submission</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Review + submit -->
+    <div class="sub-step" id="subStep3">
+      <div class="review-row">
+        <div><span class="rr-label">GitHub</span><span class="rr-val" id="reviewGh"></span></div>
+        <button type="button" class="rr-edit" data-goto="1">Edit</button>
+      </div>
+      <div class="review-row">
+        <div><span class="rr-label">LinkedIn</span><span class="rr-val" id="reviewLi"></span></div>
+        <button type="button" class="rr-edit" data-goto="2">Edit</button>
+      </div>
+      <button class="btn btn-primary" id="submitBtn">Submit Day 12</button>
+    </div>
+  </div>
+
+  <!-- Thoughtful addition: an auto-generated "Proof Receipt" the student can
+       screenshot and reuse — closing the loop between submitting proof and
+       actually being seen, which is the whole point of the challenge. -->
+  <div class="receipt-card" id="receiptCard">
+    <div class="ic">🧾</div>
+    <h4 id="receiptTitle">Day 12 — proof receipt</h4>
+    <p id="receiptBody">Streak is now 12 days. Screenshot this and drop it in your next post for extra proof.</p>
+    <button class="btn btn-secondary btn-sm" onclick="showToast('Receipt image saved (demo)')">Save as image</button>
+  </div>
+
+</div>
+
+<div class="tabbar">
+  <a href="../../dashboard/"><span class="ic">🏠</span>Home</a>
+  <a href="./" class="active"><span class="ic">📋</span>Today</a>
+  <a href="../../ranks/"><span class="ic">🏆</span>Ranks</a>
+  <a href="../../profile/"><span class="ic">👤</span>Profile</a>
+</div>
+
+<script src="../../assets/data.js"></script>
+<script src="../../assets/app.js"></script>
+<script>
+  const key = getActiveScenarioKey();
+  const s = getEffectiveState(key);
+  const mockProfile = getMockProfile();
+  const student = mockProfile ? { ...ABTALKS_MOCK.student, ...mockProfile } : ABTALKS_MOCK.student;
+  initThemeToggle();
+  applyTier(s.tier);
+  document.getElementById("tierChip").textContent = tierLabel(s.tier) + " tier";
+  // Resolve by the student's own track, matching dashboard — a DSA+CP student
+  // sees a DSA+CP task here too, not whatever track the last-viewed screen assumed.
+  const d = getDayContent(student.track, s.currentDay);
+  document.getElementById("dayEyebrow").textContent = `DAY ${d.number} OF 60`;
+  document.getElementById("prevDayArrow").title = d.number > 1 ? `Day ${d.number - 1} — already submitted` : "This is Day 1 — nothing before it";
+  document.getElementById("dayTitle").textContent = d.title;
+  document.querySelectorAll(".day-hero .meta-tag")[0].textContent = "⏱ " + d.minutes;
+  document.querySelectorAll(".day-hero .meta-tag")[1].textContent = "◆ " + d.difficulty;
+  const trackIcon = (ABTALKS_MOCK.tracks.find(t => t.name === d.track) || {}).icon || "🖥️";
+  document.querySelectorAll(".day-hero .meta-tag")[2].textContent = trackIcon + " " + d.track;
+  document.getElementById("briefText").textContent = d.brief;
+  document.getElementById("reqList").innerHTML = d.requirements.map(r => `<li>${r}</li>`).join("");
+  document.getElementById("resourceRow").innerHTML = d.resources.map(r => `<span class="resource-chip">${r}</span>`).join("");
+  document.getElementById("liHint").textContent = `Post about what you built and tag #ABTalksDay${d.number}.`;
+  document.getElementById("submitBtn").textContent = `Submit Day ${d.number}`;
+  document.getElementById("receiptTitle").textContent = `Day ${d.number} — proof receipt`;
+  document.getElementById("receiptBody").textContent = `Streak is now ${s.streak + 1} days. Screenshot this and drop it in your next post for extra proof.`;
+  document.title = `Day ${d.number} — ABTalks`;
+
+  const gh = document.getElementById("ghInput");
+  const li = document.getElementById("liInput");
+  const fieldGh = document.getElementById("fieldGh");
+  const fieldLi = document.getElementById("fieldLi");
+  const ghNext = document.getElementById("ghNext");
+  const liNext = document.getElementById("liNext");
+  const submitBtn = document.getElementById("submitBtn");
+
+  function urlLikely(v, hostHint) {
+    return v.trim().length > 6 && v.includes(".") && (!hostHint || v.toLowerCase().includes(hostHint));
+  }
+
+  function refresh() {
+    const ghOk = urlLikely(gh.value, "github");
+    const liOk = urlLikely(li.value, "linkedin");
+    fieldGh.classList.toggle("ok", ghOk);
+    fieldLi.classList.toggle("ok", liOk);
+    fieldGh.querySelector(".check").textContent = ghOk ? "✓" : "";
+    fieldLi.querySelector(".check").textContent = liOk ? "✓" : "";
+    ghNext.disabled = !ghOk;
+    liNext.disabled = !liOk;
+    return { ghOk, liOk };
+  }
+  gh.addEventListener("input", refresh);
+  li.addEventListener("input", refresh);
+
+  // ---- Guided 3-step flow: GitHub -> LinkedIn -> Review & Submit ----
+  const stepEls = { 1: document.getElementById("subStep1"), 2: document.getElementById("subStep2"), 3: document.getElementById("subStep3") };
+  const stepper = document.getElementById("submitStepper");
+
+  function goToStep(n) {
+    Object.values(stepEls).forEach(el => el.classList.remove("active"));
+    stepEls[n].classList.add("active");
+    stepper.querySelectorAll(".step-wrap").forEach(w => {
+      const s = +w.dataset.step;
+      const dot = w.querySelector(".step-dot");
+      w.classList.toggle("active", s === n);
+      w.classList.toggle("done", s < n);
+      dot.classList.toggle("active", s === n);
+      dot.classList.toggle("done", s < n);
+      dot.textContent = s < n ? "✓" : s;
+    });
+    if (n === 3) {
+      document.getElementById("reviewGh").textContent = gh.value.trim();
+      document.getElementById("reviewLi").textContent = li.value.trim();
+    }
+    stepEls[n].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  ghNext.addEventListener("click", () => { if (refresh().ghOk) goToStep(2); });
+  document.getElementById("liBack").addEventListener("click", () => goToStep(1));
+  liNext.addEventListener("click", () => { if (refresh().liOk) goToStep(3); });
+  document.querySelectorAll(".rr-edit").forEach(btn => btn.addEventListener("click", () => goToStep(+btn.dataset.goto)));
+
+  submitBtn.addEventListener("click", () => {
+    // This is the one place a submission actually persists — everything
+    // else on this page was just local form state until now.
+    const updated = recordSubmission(d.number);
+
+    submitBtn.textContent = "Submitted ✓";
+    submitBtn.disabled = true;
+    gh.disabled = true; li.disabled = true;
+    document.getElementById("receiptBody").textContent =
+      `Streak is now ${updated.streak} days. Screenshot this and drop it in your next post for extra proof.`;
+    document.getElementById("receiptCard").classList.add("show");
+    document.getElementById("receiptCard").scrollIntoView({ behavior: "smooth", block: "center" });
+    showToast(`Day ${d.number} logged — streak extended to ${updated.streak}`);
+
+    // Fire the same milestone celebration the dashboard uses if this
+    // submission just crossed into a new theme tier.
+    if (updated.tier !== getLastSeenTier()) {
+      setLastSeenTier(updated.tier);
+      setTimeout(() => celebrateTier(updated.tier), 600);
+    }
+  });
+
+  // If today's day was already submitted (e.g. the student came back to
+  // this page after logging it), show the completed state instead of a
+  // blank form — this is what was missing before: submitting used to
+  // only update this page's local UI, so reloading (or checking Profile/
+  // Dashboard) looked like nothing had happened.
+  if (s.doneDays.includes(d.number)) {
+    document.getElementById("submitStepper").style.display = "none";
+    document.querySelector(".submit-card").style.display = "none";
+    document.getElementById("receiptBody").textContent =
+      `Day ${d.number} is already logged — streak is ${s.streak} days. Come back tomorrow for Day ${Math.min(60, d.number + 1)}.`;
+    document.getElementById("receiptCard").classList.add("show");
+  }
+
+  initHelpWidget();
+</script>
+</body>
+</html>
