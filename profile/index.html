@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Profile — ABTalks</title>
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<div class="screen">
+  <div class="topbar">
+    <div class="wordmark"><span class="dot"></span>ABTALKS</div>
+    <nav class="desktop-nav">
+      <a href="../dashboard/">Home</a>
+      <a href="../day/12/">Today</a>
+      <a href="../ranks/">Ranks</a>
+      <a href="./" class="active">Profile</a>
+    </nav>
+    <div class="top-actions">
+      <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+      <div class="tier-chip" id="tierChip">Tier</div>
+    </div>
+  </div>
+
+  <div class="greet">
+    <div class="hi">Your profile</div>
+    <h2 id="pName">—</h2>
+  </div>
+
+  <div class="stat-grid" id="pStats"></div>
+
+  <div class="brief-card" style="margin-top:18px;">
+    <h4>Editable details</h4>
+    <div class="field">
+      <label for="pNameInput">Name</label>
+      <div class="input-wrap"><span class="ic">◐</span><input id="pNameInput" type="text" /></div>
+    </div>
+    <div class="field" style="margin-bottom:6px;">
+      <label>Track</label>
+    </div>
+    <div class="track-grid" id="pTrackPicker" style="margin:0 0 14px;"></div>
+    <button class="btn btn-secondary" id="saveBtn">Save changes</button>
+  </div>
+
+  <div class="section-title">Badges earned</div>
+  <div class="badge-row" id="pBadges"></div>
+
+  <div class="section-title">Public proof log</div>
+  <div class="leader-card" id="proofLog"></div>
+
+  <div style="padding:20px 20px 0;">
+    <button class="btn btn-ghost" id="resetBtn">Reset demo data</button>
+  </div>
+</div>
+
+<div class="tabbar">
+  <a href="../dashboard/"><span class="ic">🏠</span>Home</a>
+  <a href="../day/12/"><span class="ic">📋</span>Today</a>
+  <a href="../ranks/"><span class="ic">🏆</span>Ranks</a>
+  <a href="./" class="active"><span class="ic">👤</span>Profile</a>
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+  const key = getActiveScenarioKey();
+  const s = getEffectiveState(key);
+  const mockProfile = getMockProfile();
+  const student = mockProfile || ABTALKS_MOCK.student;
+
+  initThemeToggle();
+  applyTier(s.tier);
+  document.getElementById("tierChip").textContent = tierLabel(s.tier) + " tier";
+  document.getElementById("pName").textContent = student.name;
+  document.getElementById("pNameInput").value = student.name;
+
+  document.getElementById("pStats").innerHTML = `
+    <div class="stat-card"><div class="v">${s.daysCompleted}/60</div><div class="l">Days done</div></div>
+    <div class="stat-card"><div class="v">${s.longestStreak}</div><div class="l">Best streak</div></div>
+    <div class="stat-card"><div class="v">${ABTALKS_MOCK.badges.filter(b => s.daysCompleted >= b.need).length}</div><div class="l">Badges</div></div>`;
+
+  const trackPicker = document.getElementById("pTrackPicker");
+  const currentTrack = student.track || ABTALKS_MOCK.student.track;
+  trackPicker.innerHTML = ABTALKS_MOCK.tracks.map(t => `
+    <div class="track-card" data-name="${t.name}" style="cursor:pointer;border-color:${t.name === currentTrack ? "var(--accent)" : "var(--line)"};">
+      <div class="icn">${t.icon}</div><h4>${t.name}</h4><p>${t.desc}</p>
+    </div>`).join("");
+  trackPicker.querySelectorAll(".track-card").forEach(c => {
+    c.addEventListener("click", () => {
+      trackPicker.querySelectorAll(".track-card").forEach(x => x.style.borderColor = "var(--line)");
+      c.style.borderColor = "var(--accent)";
+    });
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const chosen = trackPicker.querySelector('.track-card[style*="var(--accent)"]');
+    setMockProfile({
+      name: document.getElementById("pNameInput").value.trim() || student.name,
+      track: chosen ? chosen.dataset.name : currentTrack,
+      startedAt: student.startedAt || new Date().toISOString()
+    });
+    showToast("Profile saved");
+    document.getElementById("pName").textContent = document.getElementById("pNameInput").value.trim() || student.name;
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    localStorage.removeItem("abtalks_profile");
+    localStorage.removeItem("abtalks_scenario");
+    localStorage.removeItem("abtalks_last_tier");
+    localStorage.removeItem("abtalks_progress");
+    showToast("Demo data reset");
+    setTimeout(() => location.href = "../", 700);
+  });
+
+  document.getElementById("pBadges").innerHTML = ABTALKS_MOCK.badges.map(b => {
+    const unlocked = s.daysCompleted >= b.need;
+    return `<div class="badge ${unlocked ? "" : "locked"}"><div class="ic">${b.icon}</div><div class="n">${b.name}</div></div>`;
+  }).join("");
+
+  const proofDays = progressRungs(s).filter(r => r.state === "done").slice(-5).reverse();
+  document.getElementById("proofLog").innerHTML = proofDays.length ? proofDays.map(r => `
+    <div class="leader-row">
+      <div class="rank">D${r.day}</div>
+      <div class="nm">Commit + LinkedIn post submitted</div>
+      <div class="streak">✓</div>
+    </div>`).join("") : `<div class="leader-row"><div class="nm" style="color:var(--text-faint)">No submissions yet — proof from each completed day will show here.</div></div>`;
+  initHelpWidget();
+</script>
+</body>
+</html>
