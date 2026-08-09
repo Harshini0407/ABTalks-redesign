@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ranks — ABTalks</title>
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<div class="screen">
+  <div class="topbar">
+    <div class="wordmark"><span class="dot"></span>ABTALKS</div>
+    <nav class="desktop-nav">
+      <a href="../dashboard/">Home</a>
+      <a href="../day/12/">Today</a>
+      <a href="./" class="active">Ranks</a>
+      <a href="../profile/">Profile</a>
+    </nav>
+    <div class="top-actions">
+      <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+      <div class="tier-chip" id="tierChip">Tier</div>
+    </div>
+  </div>
+
+  <div class="greet">
+    <div class="hi">Full-Stack Web track</div>
+    <h2>Ranks</h2>
+  </div>
+
+  <div class="judge-panel" style="margin-top:14px;">
+    <div class="lbl">Sort by</div>
+    <div class="judge-opts" id="sortOpts">
+      <button class="on" data-k="streak">Current streak</button>
+      <button data-k="longest">Longest streak</button>
+    </div>
+  </div>
+
+  <div class="leader-card" style="margin-top:16px;">
+    <div class="lh"><span>Full-Stack Web · all students</span><span id="countLbl"></span></div>
+    <div id="fullLeaderList"></div>
+  </div>
+
+  <p class="foot-note">Ranks recalculate daily once a student submits proof for the day.</p>
+</div>
+
+<div class="tabbar">
+  <a href="../dashboard/"><span class="ic">🏠</span>Home</a>
+  <a href="../day/12/"><span class="ic">📋</span>Today</a>
+  <a href="./" class="active"><span class="ic">🏆</span>Ranks</a>
+  <a href="../profile/"><span class="ic">👤</span>Profile</a>
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+  const key = getActiveScenarioKey();
+  const s = getEffectiveState(key);
+  const mockProfile = getMockProfile();
+  const student = mockProfile ? { ...ABTALKS_MOCK.student, ...mockProfile } : ABTALKS_MOCK.student;
+  initThemeToggle();
+  applyTier(s.tier);
+  document.getElementById("tierChip").textContent = tierLabel(s.tier) + " tier";
+
+  // Extend the mock leaderboard with a longest-streak field so both sorts feel real.
+  // The "you" row's name and streak now follow the saved profile / active scenario
+  // instead of staying frozen on the seed data — matches dashboard and profile.
+  const extended = ABTALKS_MOCK.leaderboard.map(p => {
+    if (p.you) {
+      return { ...p, name: student.name, streak: s.streak, longest: Math.max(p.streak, s.longestStreak) };
+    }
+    return { ...p, longest: p.streak + Math.floor(Math.random() * 6) };
+  });
+
+  function paint(sortKey) {
+    const rows = [...extended].sort((a,b) => (sortKey === "streak" ? b.streak - a.streak : b.longest - a.longest));
+    document.getElementById("countLbl").textContent = rows.length + " ranked";
+    document.getElementById("fullLeaderList").innerHTML = rows.map((p, i) => `
+      <div class="leader-row ${p.you ? "me" : ""}">
+        <div class="rank">#${i+1}</div>
+        <div class="avatar">${p.name.split(" ").map(w=>w[0]).join("")}</div>
+        <div class="nm">${p.name}${p.you ? " (you)" : ""}</div>
+        <div class="streak">${sortKey === "streak" ? p.streak + "d" : p.longest + "d best"}</div>
+      </div>`).join("");
+  }
+  paint("streak");
+
+  document.getElementById("sortOpts").querySelectorAll("button").forEach(b => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#sortOpts button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      paint(b.dataset.k);
+    });
+  });
+  initHelpWidget();
+</script>
+</body>
+</html>
