@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ABTalks — Prove you show up. Every day, for 60 days.</title>
+<meta name="description" content="A 60-day coding challenge for Indian college students. Build daily, prove it with a commit and a LinkedIn post, and turn a streak into a story recruiters notice." />
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body data-tier="t4">
+<div class="screen">
+
+  <div class="topbar">
+    <div class="wordmark"><span class="dot"></span>ABTALKS</div>
+    <nav class="nav-links">
+      <a href="#about">What it is</a>
+      <a href="#tracks">Tracks</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="top-actions">
+      <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+      <a href="dashboard/" class="btn btn-secondary btn-sm">Log in</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+    </div>
+
+  </div>
+
+  <div class="mob-nav" id="mobNav">
+    <button class="mob-close" id="mobClose" aria-label="Close menu">✕</button>
+    <a href="#about" data-close>What it is</a>
+    <a href="#tracks" data-close>Tracks</a>
+    <a href="#how" data-close>How it works</a>
+    <a href="#faq" data-close>FAQ</a>
+    <a href="dashboard/" data-close>Log in</a>
+  </div>
+
+  <section class="hero" id="about">
+    <div class="hero-blobs"><span class="b1"></span><span class="b2"></span></div>
+    <span class="eyebrow anim-up" style="--d:.02s">60-day build challenge</span>
+    <h1 class="anim-up" style="--d:.08s">Show up daily.<br>Build in public.<br><em>Get seen.</em></h1>
+    <p class="sub anim-up" style="--d:.14s">Pick a track, ship something every day for 60 days, and prove it with a GitHub commit and a LinkedIn post. Your streak becomes a public record recruiters can actually check.</p>
+
+    <div class="proof-row anim-up" style="--d:.2s">
+      <div class="proof-pill"><b>12,400+</b> students</div>
+      <div class="proof-pill"><b>2</b> proofs a day · commit + post</div>
+      <div class="proof-pill"><b>4</b> tracks to choose from</div>
+    </div>
+
+    <a href="start/" class="btn btn-primary anim-up" style="margin-top:18px;--d:.26s">Start Day 1 — free</a>
+    <p class="foot-note anim-up" style="margin-top:10px;--d:.3s">No credit card. Takes 45 seconds to pick a track.</p>
+
+    <div class="avatar-proof anim-up" style="--d:.34s">
+      <div class="avatar-stack">
+        <div class="av">AR</div><div class="av">SI</div><div class="av">DP</div><div class="av">PN</div>
+      </div>
+      <div class="ap-text"><b>500+</b> students started this week</div>
+    </div>
+
+    <div class="mini-steps anim-up" style="--d:.4s">
+      <div class="ms-row"><span class="ms-n">1</span><span><b>Pick a track</b> — Web, AI/ML, Android or DSA, 45 seconds.</span></div>
+      <div class="ms-row"><span class="ms-n">2</span><span><b>Get Day 1's task</b> — no email verification, no card.</span></div>
+      <div class="ms-row"><span class="ms-n">3</span><span><b>Ship it and prove it</b> — one commit, one LinkedIn post.</span></div>
+    </div>
+  </section>
+
+  <div class="about-band">
+    <p class="k-line"><b>ABTalks</b> is a free, 60-day coding challenge built for Indian college students. Every day you get one small build to ship — and you prove you actually did it, publicly, so consistency stops being invisible.</p>
+    <div class="about-pillars">
+      <div class="pillar"><span class="ic">🎯</span><div><h5>One task a day</h5><p>Scoped to 60–90 minutes, so it fits around classes and assignments.</p></div></div>
+      <div class="pillar"><span class="ic">✅</span><div><h5>Two real proofs</h5><p>A GitHub commit for the build, a LinkedIn post for visibility. Both checked, not assumed.</p></div></div>
+      <div class="pillar"><span class="ic">📈</span><div><h5>A public track record</h5><p>Your streak, badges, and rank are visible — the same evidence recruiters look for.</p></div></div>
+    </div>
+  </div>
+
+  <div class="trust-strip">
+    <div class="trust-cell"><div class="v"><span class="count-up" data-to="12400">0</span>+</div><div class="l">Students building</div></div>
+    <div class="trust-cell"><div class="v">60 days</div><div class="l">Per challenge cycle</div></div>
+    <div class="trust-cell"><div class="v">Free</div><div class="l">No cost to join</div></div>
+  </div>
+
+  <div class="ladder-preview">
+    <div class="float-chip">🔥 Day 12 streak</div>
+    <div class="cap">
+      <span>What your streak looks like</span>
+      <span>Day 12 of 60</span>
+    </div>
+    <div class="rungs" id="previewRungs"></div>
+  </div>
+
+  <div class="section-title" id="tracks">Choose your track</div>
+  <div class="track-grid">
+    <div class="track-card"><div class="icn">🖥️</div><h4>Full-Stack Web</h4><p>Ship a real product, one feature a day</p></div>
+    <div class="track-card"><div class="icn">🤖</div><h4>AI / ML</h4><p>Models, data, deployed demos</p></div>
+    <div class="track-card"><div class="icn">📱</div><h4>Android</h4><p>Kotlin apps on a real device</p></div>
+    <div class="track-card"><div class="icn">🔐</div><h4>DSA + CP</h4><p>Daily problems, contest-ready</p></div>
+  </div>
+
+  <div class="section-title" id="how">How it works</div>
+  <div class="step-row">
+    <div class="step">
+      <div class="num">01</div>
+      <div><h5>Get today's task</h5><p>One focused build, scoped to fit around college — usually 60–90 minutes.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">02</div>
+      <div><h5>Build it, then prove it</h5><p>Link the GitHub commit and the LinkedIn post you made about it. Both are checked, not assumed.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">03</div>
+      <div><h5>Watch your streak repaint the app</h5><p>Every 3 days you unlock a new named theme — 20 in total, from Ash & Charcoal on Day 1 to Supernova Gold on Day 60 — a visible, honest sign of how far you've come.</p></div>
+    </div>
+  </div>
+
+  <div class="section-title">Why it works</div>
+  <div class="quote-card">
+    <p>"I stopped treating coding as a weekend thing. The streak made skipping a day feel like breaking a promise to myself — and my LinkedIn posts started getting recruiter replies by week 4."</p>
+    <div class="who">— Ishita Rao, Full-Stack track, Day 52</div>
+  </div>
+
+  <div class="cta-band">
+    <h3>Day 1 is the hardest one.</h3>
+    <p>Everything after it just needs you to show up again.</p>
+    <a href="start/" class="btn btn-primary">Begin your streak</a>
+  </div>
+
+  <div class="section-title" id="faq">Questions</div>
+  <div class="faq-wrap">
+    <details class="faq-item">
+      <summary>Is ABTalks actually free?</summary>
+      <p>Yes — joining and running the full 60-day challenge costs nothing. There's no card required to start Day 1.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What if I miss a day?</summary>
+      <p>Your streak resets, but your longest streak stays on record, and every student gets a streak freeze to protect one missed day without losing progress.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Do I need to already know how to code?</summary>
+      <p>You need the basics of your chosen track. Tasks ramp in difficulty across the 60 days rather than assuming expert-level skill on Day 1.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Why does the theme change as my streak grows?</summary>
+      <p>It's a visible, honest signal of consistency — 20 named themes across the 60 days (Ash & Charcoal, First Spark, Emerald Forest, Cosmic Nebula… all the way to Supernova Gold), each unlocked every 3 days you build. Not a cosmetic skin — a real progress marker.</p>
+    </details>
+  </div>
+
+  <footer class="site-footer">
+    <div class="fw">ABTALKS</div>
+    <p class="ftag">A 60-day build-in-public challenge for Indian college students. Built for late nights, real proof, and getting seen.</p>
+    <div class="footer-links">
+      <a href="start/">Start Day 1</a>
+      <a href="dashboard/">Dashboard</a>
+      <a href="ranks/">Ranks</a>
+      <a href="profile/">Profile</a>
+    </div>
+    <p class="footer-legal">This is a redesign concept built for a design challenge — demo data only, no real accounts.</p>
+  </footer>
+</div>
+
+<button class="btt" id="btt" aria-label="Back to top">↑</button>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  initThemeToggle();
+  applyTier("t4");
+  const el = document.getElementById("previewRungs");
+  const rungs = ABTALKS_MOCK.scenarios.onTrack.rungs.slice(0, 30);
+  el.innerHTML = rungs.map(r => `<div class="rung ${r.state === 'done' ? 'on' : ''} ${r.state === 'today' ? 'today' : ''}"></div>`).join("");
+
+  // Sticky nav — adds a background once the page scrolls past the hero
+  const topbar = document.querySelector(".topbar");
+  window.addEventListener("scroll", () => {
+    topbar.classList.toggle("stuck", window.scrollY > 40);
+    document.getElementById("btt").classList.toggle("show", window.scrollY > 500);
+  });
+
+  // Animated count-up — runs once, when the trust strip scrolls into view
+  const counters = document.querySelectorAll(".count-up");
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const target = +entry.target.dataset.to;
+      const dur = 900;
+      const start = performance.now();
+      function tick(now) {
+        const p = Math.min(1, (now - start) / dur);
+        entry.target.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.6 });
+  counters.forEach(c => io.observe(c));
+
+  document.getElementById("btt").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  // Mobile menu
+  const hamburger = document.getElementById("hamburger");
+  const mobNav = document.getElementById("mobNav");
+  const closeMob = () => mobNav.classList.remove("show");
+  hamburger.addEventListener("click", () => mobNav.classList.add("show"));
+  document.getElementById("mobClose").addEventListener("click", closeMob);
+  mobNav.querySelectorAll("[data-close]").forEach(a => a.addEventListener("click", closeMob));
+
+  initHelpWidget();
+</script>
+</body>
+</html>
