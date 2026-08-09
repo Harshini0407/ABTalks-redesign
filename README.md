@@ -1,3 +1,5 @@
+<img width="1135" height="622" alt="WhatsApp Image 2026-08-09 at 5 32 01 PM" src="https://github.com/user-attachments/assets/b3c5d17c-d538-4907-ae1d-32de7a229518" />
+
 # ABTalks Redesign
 
 A mobile-first redesign of ABTalks, a 60-day coding challenge for Indian
@@ -112,3 +114,4 @@ URLs — no extra redirect/rewrite configuration needed.
 
 To preview a change before pushing, just open the relevant `index.html`
 file directly in a browser.
+
