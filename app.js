@@ -82,3 +82,123 @@ function getLastSeenTier() {
 function setLastSeenTier(t) {
   localStorage.setItem("abtalks_last_tier", t);
 }
+function celebrateTier(tier) {
+  const info = TIER_COPY[tier];
+  let overlay = document.querySelector(".celebrate-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "celebrate-overlay";
+    overlay.innerHTML = `
+      <div class="celebrate-card">
+        <div class="confetti-wrap"></div>
+        <div class="spark">${info.icon}</div>
+        <div class="tier-name">${info.name}</div>
+        <div class="tier-days">${info.days}</div>
+        <p>${info.line}</p>
+        <button class="btn btn-primary btn-sm" id="celebrateClose">Keep going</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector("#celebrateClose").addEventListener("click", () => {
+      overlay.classList.remove("show");
+    });
+  } else {
+    overlay.querySelector(".spark").textContent = info.icon;
+    overlay.querySelector(".tier-name").textContent = info.name;
+    overlay.querySelector(".tier-days").textContent = info.days;
+    overlay.querySelector(".tier-days").nextElementSibling.textContent = info.line;
+  }
+  const wrap = overlay.querySelector(".confetti-wrap");
+  wrap.innerHTML = "";
+  for (let i = 0; i < 18; i++) {
+    const bit = document.createElement("div");
+    bit.className = "confetti-bit";
+    bit.style.left = Math.random() * 100 + "%";
+    bit.style.background = i % 2 ? "var(--accent)" : "var(--accent-2)";
+    bit.style.animationDelay = (Math.random() * 0.4) + "s";
+    wrap.appendChild(bit);
+  }
+  requestAnimationFrame(() => overlay.classList.add("show"));
+}
+
+function getMockProfile() {
+  const raw = localStorage.getItem("abtalks_profile");
+  return raw ? JSON.parse(raw) : null;
+}
+function setMockProfile(p) {
+  localStorage.setItem("abtalks_profile", JSON.stringify(p));
+}
+
+/* ---- Real progress tracking ----
+   The four objects in ABTALKS_MOCK.scenarios are fixed "Judge Preview"
+   baselines and are never mutated, so switching between them always shows
+   the same four edge cases. Everything a student actually *does* — i.e.
+   submitting a day's proof — is tracked separately here, seeded from
+   whichever baseline is active, so the dashboard/profile/today screens
+   actually move forward after a real submission instead of snapping back
+   to the scenario's fixed starting point. */
+const PROGRESS_KEY = "abtalks_progress";
+
+function getStoredProgress() {
+  const raw = localStorage.getItem(PROGRESS_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+function setStoredProgress(p) {
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  return p;
+}
+
+function progressFromScenario(key) {
+  const base = ABTALKS_MOCK.scenarios[key] || ABTALKS_MOCK.scenarios.onTrack;
+  return {
+    scenarioKey: key,
+    streak: base.streak,
+    longestStreak: base.longestStreak,
+    daysCompleted: base.daysCompleted,
+    currentDay: base.currentDay,
+    missedYesterday: base.missedYesterday,
+    freezesLeft: base.freezesLeft,
+    tier: base.tier,
+    doneDays: base.rungs.filter(r => r.state === "done").map(r => r.day)
+  };
+}
+
+/* The live, mutable state for whichever scenario is currently active.
+   Self-heals from the scenario baseline the first time it's read, or
+   whenever the active scenario key has changed (e.g. Judge Preview). */
+function getEffectiveState(key) {
+  let p = getStoredProgress();
+  if (!p || p.scenarioKey !== key) {
+    p = progressFromScenario(key);
+    setStoredProgress(p);
+  }
+  return p;
+}
+
+/* Explicitly re-seeds progress from a scenario's baseline. Used only when
+   a judge taps a different "Preview a scenario" option, so switching
+   personas always shows that persona's real edge case rather than
+   whatever the previously-active persona had submitted. */
+function resetProgress(key) {
+  return setStoredProgress(progressFromScenario(key));
+}
+
+/* The one place real progression happens: called when a student actually
+   submits proof for a day. Advances streak/day-count/tier and unlocks the
+   next day, and persists it so every other screen reflects it immediately. */
+function recordSubmission(dayNumber) {
+  const p = getStoredProgress();
+  if (!p) return null;
+  if (p.doneDays.includes(dayNumber)) return p; // already logged — don't double count
+  p.doneDays.push(dayNumber);
+  p.daysCompleted = Math.min(60, p.daysCompleted + 1);
+  p.streak = p.missedYesterday ? 1 : p.streak + 1;
+  p.longestStreak = Math.max(p.longestStreak, p.streak);
+  p.missedYesterday = false;
+  p.currentDay = Math.min(60, Math.max(p.currentDay, dayNumber + 1));
+  p.tier = tierFromStreak(p.daysCompleted);
+  return setStoredProgress(p);
+}
+
+function progressRungs(p) {
+  return buildRungs(p.currentDay, p.doneDays);
+}
