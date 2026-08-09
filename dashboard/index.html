@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dashboard — ABTalks</title>
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<div class="screen">
+
+  <div class="topbar">
+    <div class="wordmark"><span class="dot"></span>ABTALKS</div>
+    <nav class="desktop-nav">
+      <a href="./" class="active">Home</a>
+      <a href="../day/12/">Today</a>
+      <a href="../ranks/">Ranks</a>
+      <a href="../profile/">Profile</a>
+    </nav>
+    <div class="top-actions">
+      <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+      <div class="tier-chip" id="tierChip">Spark</div>
+    </div>
+  </div>
+
+  <div class="greet">
+    <div class="hi" id="greetLine">Good to see you back</div>
+    <h2 id="studentName">Ishita Rao</h2>
+  </div>
+
+  <!-- Streak banner: swaps entirely across the day1 / missed / on-track states -->
+  <div class="banner" id="streakBanner"></div>
+
+  <div class="stat-grid" id="statGrid"></div>
+
+  <div class="progress-card">
+    <div class="head"><span>Challenge progress</span><b id="progressPct">0%</b></div>
+    <div class="bar-track"><div class="bar-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-title">Today's task</div>
+  <div class="task-card" id="taskCard"></div>
+
+  <div class="section-title">Achievements</div>
+  <div class="badge-row" id="badgeRow"></div>
+
+  <div class="section-title">Track standing</div>
+  <div class="leader-card">
+    <div class="lh"><span>Full-Stack Web · this week</span><span>Top 5</span></div>
+    <div id="leaderList"></div>
+  </div>
+
+  <!-- Judge preview: lets anyone flip through the real edge cases in one tap,
+       instead of needing three separate mock accounts to see them. -->
+  <div class="judge-panel">
+    <div class="lbl">Preview a scenario</div>
+    <div class="judge-opts" id="scenarioOpts"></div>
+  </div>
+
+  <p class="foot-note" style="margin-top:16px;">Demo data — nothing here is a real account.</p>
+</div>
+
+<div class="tabbar">
+  <a href="../dashboard/" class="active"><span class="ic">🏠</span>Home</a>
+  <a href="../day/12/"><span class="ic">📋</span>Today</a>
+  <a href="../ranks/"><span class="ic">🏆</span>Ranks</a>
+  <a href="../profile/"><span class="ic">👤</span>Profile</a>
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const fromUrl = params.get("scenario");
+if (fromUrl && ABTALKS_MOCK.scenarios[fromUrl]) setActiveScenarioKey(fromUrl);
+let activeKey = getActiveScenarioKey();
+
+function render(key) {
+  activeKey = key;
+  setActiveScenarioKey(key);
+  const s = getEffectiveState(key);
+  const mockProfile = getMockProfile();
+  const student = mockProfile ? { ...ABTALKS_MOCK.student, ...mockProfile } : ABTALKS_MOCK.student;
+
+  initThemeToggle();
+  applyTier(s.tier);
+  document.getElementById("tierChip").textContent = tierLabel(s.tier) + " tier";
+  document.getElementById("studentName").textContent = student.name;
+
+  // Fire the milestone celebration whenever the tier actually changes —
+  // this is what makes crossing day 10/30/50 feel like an event, not a
+  // silent CSS variable swap.
+  const lastTier = getLastSeenTier();
+  if (lastTier && lastTier !== s.tier) celebrateTier(s.tier);
+  setLastSeenTier(s.tier);
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greetWord = hour >= 22 || hour < 5 ? "Still up? Respect." : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  document.getElementById("greetLine").textContent = greetWord;
+
+  // Streak banner — three distinct edge-case states
+  const banner = document.getElementById("streakBanner");
+  if (s.key === "day1") {
+    banner.className = "banner empty";
+    banner.innerHTML = `
+      <div class="big-icn">🌱</div>
+      <div class="streak-num" style="justify-content:center;margin-top:8px;">0<small>day streak</small></div>
+      <div class="streak-tag">Every streak starts at zero. Finish <b>Day 1</b> below to light the first rung.</div>`;
+  } else if (s.missedYesterday) {
+    banner.className = "banner warn";
+    banner.innerHTML = `
+      <div class="streak-num">0<small>day streak</small></div>
+      <div class="streak-tag">You missed <b>Day 22</b> — your streak reset, but your best run of <b>${s.longestStreak} days</b> is still on record.
+      ${s.freezesLeft > 0 ? `You still have <b>1 streak freeze</b> saved for next time.` : ""}</div>`;
+  } else {
+    banner.className = "banner flame";
+    const compliment =
+      s.streak >= 45 ? "You're in the final stretch — this is what finishing looks like." :
+      s.streak >= 21 ? "Three weeks straight. This isn't luck anymore, it's a habit." :
+      s.streak >= 7  ? "A full week without missing a day. Keep the chain going." :
+                        "Day " + s.streak + " down. Show up tomorrow and make it two in a row.";
+    banner.innerHTML = `
+      <div class="streak-num">${s.streak}<small>day streak</small></div>
+      <div class="streak-tag">Longest streak: <b>${s.longestStreak} days</b> · ${s.freezesLeft} streak freeze left</div>
+      <div class="streak-tag" style="margin-top:6px;opacity:.85;">${compliment}</div>`;
+  }
+
+  // Stats
+  document.getElementById("statGrid").innerHTML = `
+    <div class="stat-card"><div class="v">${s.daysCompleted}/60</div><div class="l">Days done</div></div>
+    <div class="stat-card"><div class="v">${s.longestStreak}</div><div class="l">Best streak</div></div>
+    <div class="stat-card"><div class="v">#3</div><div class="l">On track</div></div>`;
+
+  // Progress
+  const pct = Math.round((s.daysCompleted / 60) * 100);
+  document.getElementById("progressPct").textContent = pct + "%";
+  document.getElementById("progressFill").style.width = pct + "%";
+
+  // Today's task — resolved by the student's own track + the active scenario's day,
+  // so a DSA+CP student sees a DSA+CP task, not a Full-Stack Web one wearing their label.
+  const day = getDayContent(student.track, s.currentDay);
+  document.getElementById("taskCard").innerHTML = `
+    <div class="top"><span class="day-lbl">DAY ${day.number} · ${student.track.toUpperCase()}</span><span class="status-dot">Not submitted</span></div>
+    <h3>${day.title}</h3>
+    <p>${day.brief.slice(0, 110)}…</p>
+    <a href="../day/12/" class="btn btn-primary">Open Day ${day.number}</a>`;
+
+  // Badges
+  document.getElementById("badgeRow").innerHTML = ABTALKS_MOCK.badges.map(b => {
+    const unlocked = s.daysCompleted >= b.need;
+    return `<div class="badge ${unlocked ? "" : "locked"}"><div class="ic">${b.icon}</div><div class="n">${b.name}</div></div>`;
+  }).join("");
+
+  // Leaderboard
+  document.getElementById("leaderList").innerHTML = ABTALKS_MOCK.leaderboard.map((p, i) => `
+    <div class="leader-row ${p.you ? "me" : ""}">
+      <div class="rank">#${i + 1}</div>
+      <div class="avatar">${p.name.split(" ").map(w => w[0]).join("")}</div>
+      <div class="nm">${p.name}${p.you ? " (you)" : ""}</div>
+      <div class="streak">${p.streak}d</div>
+    </div>`).join("");
+
+  // Judge preview switcher
+  document.getElementById("scenarioOpts").innerHTML = Object.values(ABTALKS_MOCK.scenarios).map(sc => `
+    <button class="${sc.key === key ? "on" : ""}" onclick="previewScenario('${sc.key}')">${sc.label}</button>
+  `).join("");
+}
+
+/* Tapping a different Judge Preview option is a persona switch, not a
+   day's submission — it should always land on that persona's real
+   starting point, so reset progress to the scenario's baseline first. */
+function previewScenario(newKey) {
+  resetProgress(newKey);
+  render(newKey);
+}
+
+render(activeKey);
+initHelpWidget();
+
+// One-time welcome nudge — fires only immediately after /start hands off here
+// on the day1 scenario, not on every future day1-preview visit.
+if (activeKey === "day1" && !sessionStorage.getItem("abtalks_welcomed")) {
+  sessionStorage.setItem("abtalks_welcomed", "1");
+  setTimeout(() => showToast("Welcome, " + (getMockProfile()?.name || "there") + " — finish Day 1 to unlock your first badge 🔥"), 500);
+}
+</script>
+</body>
+</html>
