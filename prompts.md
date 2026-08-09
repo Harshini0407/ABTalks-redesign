@@ -21,3 +21,23 @@ Asked for a clearer landing page explaining what ABTalks is, a light/dark theme 
 5 — Claude
 
 A consolidated list of fixes and improvements after reviewing a build: saved name not showing on Profile/Ranks, only 4 tracks existing, and achievements not unlocking visually. Also requested day content for all 60 days instead of one, streak-based motivational copy, a missed-streak reminder module, richer profile fields, a language toggle, general UI/UX polish, and a final self-check against the original problem statement.
+
+6 — Gemini
+
+Requested a hackathon-prep reference document comparing the ABTalks baseline to the required redesign for each route, with UX directions (dark mode, a catch-up/recovery flow for missed days, a LinkedIn caption generator, a streak heatmap) and a pre-submission checklist (mobile viewport, exact routes, mocked data, public repo, live demo link, AI usage log). Used as a planning reference, not copied directly into the build.
+
+7 — Claude
+
+Reported and iterated on a data-sync bug where the dashboard and submission view weren't consistently reflecting the correct day after a submission, until it was resolved.
+
+8 — Claude
+
+Asked whether the build was fully in sync with the original problem statement and whether the supporting documentation reflected the latest changes.
+
+9 — Claude
+
+Asked for a plain-language summary of exactly what had changed in the latest update.
+
+10 — Claude
+
+Flagged a form bug where LinkedIn-related text was appearing in the GitHub link field, and asked for it to be fixed for good.
