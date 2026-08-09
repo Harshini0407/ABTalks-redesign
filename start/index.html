@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Start your streak — ABTalks</title>
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<div class="screen">
+  <div class="topbar">
+    <a href="../" class="arrow-btn" aria-label="Back">←</a>
+    <div class="wordmark"><span class="dot"></span>ABTALKS</div>
+    <button class="theme-toggle" aria-label="Toggle light/dark theme">☀️</button>
+  </div>
+
+  <div class="hero" style="padding-top:10px;">
+    <span class="eyebrow">Step 1 of 1</span>
+    <h1 style="font-size:26px;">Set up your streak</h1>
+    <p class="sub">No password, no email verification — just tell us who you are and what you're building. This is mock data, but the flow is real.</p>
+  </div>
+
+  <div class="stepper" id="regStepper">
+    <div class="step-wrap active" data-step="1"><div class="step-dot active">1</div><span>Your name</span></div>
+    <div class="step-line"></div>
+    <div class="step-wrap" data-step="2"><div class="step-dot">2</div><span>Track</span></div>
+  </div>
+
+  <div class="brief-card" style="margin-top:4px;">
+    <div class="sub-step active" id="regStep1">
+      <div class="field">
+        <label for="nameInput">Your name</label>
+        <div class="input-wrap">
+          <span class="ic">◐</span>
+          <input id="nameInput" type="text" placeholder="e.g. Ishita Rao" autocomplete="off" />
+        </div>
+        <div class="hint">This is how you'll appear on the leaderboard.</div>
+      </div>
+      <button class="btn btn-primary" id="nameNext" disabled>Continue to track</button>
+    </div>
+
+    <div class="sub-step" id="regStep2">
+      <div class="field" style="margin-bottom:4px;">
+        <label>Pick a track</label>
+      </div>
+      <div class="track-grid" id="trackPicker" style="margin:0;"></div>
+      <div class="step-actions" style="margin-top:14px;">
+        <button class="btn btn-secondary" id="trackBack">Back</button>
+        <button class="btn btn-primary" id="beginBtn" disabled>Start Day 1</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:10px 20px 0;">
+    <p class="foot-note">You can switch tracks later from your profile.</p>
+  </div>
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+  initThemeToggle();
+  applyTier("t1");
+  const picker = document.getElementById("trackPicker");
+  let chosen = null;
+  picker.innerHTML = ABTALKS_MOCK.tracks.map((t, i) => `
+    <div class="track-card" data-i="${i}" style="cursor:pointer;">
+      <div class="icn">${t.icon}</div><h4>${t.name}</h4><p>${t.desc}</p>
+    </div>`).join("");
+
+  picker.querySelectorAll(".track-card").forEach(card => {
+    card.addEventListener("click", () => {
+      picker.querySelectorAll(".track-card").forEach(c => c.style.borderColor = "var(--line)");
+      card.style.borderColor = "var(--accent)";
+      chosen = ABTALKS_MOCK.tracks[card.dataset.i].name;
+      checkReady();
+    });
+  });
+
+  const nameInput = document.getElementById("nameInput");
+  const nameNext = document.getElementById("nameNext");
+  const beginBtn = document.getElementById("beginBtn");
+
+  nameInput.addEventListener("input", () => {
+    nameNext.disabled = !(nameInput.value.trim().length > 1);
+  });
+  function checkReady() {
+    beginBtn.disabled = !chosen;
+  }
+
+  const regStepper = document.getElementById("regStepper");
+  const regSteps = { 1: document.getElementById("regStep1"), 2: document.getElementById("regStep2") };
+  function goToRegStep(n) {
+    Object.values(regSteps).forEach(el => el.classList.remove("active"));
+    regSteps[n].classList.add("active");
+    regStepper.querySelectorAll(".step-wrap").forEach(w => {
+      const s = +w.dataset.step;
+      const dot = w.querySelector(".step-dot");
+      w.classList.toggle("active", s === n);
+      w.classList.toggle("done", s < n);
+      dot.classList.toggle("active", s === n);
+      dot.classList.toggle("done", s < n);
+      dot.textContent = s < n ? "✓" : s;
+    });
+  }
+  nameNext.addEventListener("click", () => { if (!nameNext.disabled) goToRegStep(2); });
+  document.getElementById("trackBack").addEventListener("click", () => goToRegStep(1));
+
+  beginBtn.addEventListener("click", () => {
+    setMockProfile({ name: nameInput.value.trim(), track: chosen, startedAt: new Date().toISOString() });
+    setActiveScenarioKey("day1");
+    setLastSeenTier("t1");
+    location.href = "../dashboard/";
+  });
+
+  initHelpWidget();
+</script>
+</body>
+</html>
