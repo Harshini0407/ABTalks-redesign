@@ -202,3 +202,60 @@ function recordSubmission(dayNumber) {
 function progressRungs(p) {
   return buildRungs(p.currentDay, p.doneDays);
 }
+/* Floating Help button — present on every screen so a confused first-time
+   visitor or a stuck student always has a working way to get unstuck,
+   without needing a real backend. */
+function initHelpWidget() {
+  if (document.querySelector(".help-fab")) return;
+
+  const fab = document.createElement("button");
+  fab.className = "help-fab";
+  fab.setAttribute("aria-label", "Get help");
+  fab.textContent = "?";
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "help-backdrop";
+  backdrop.innerHTML = `
+    <div class="help-panel" role="dialog" aria-label="Help">
+      <div class="hp-head"><h4>Need a hand?</h4><button class="hp-close" aria-label="Close help">✕</button></div>
+      <p class="hp-sub">Most questions are answered in seconds — pick one below.</p>
+      <div class="hp-links">
+        <button type="button" data-faq="submit">How do I submit proof for a day? <span class="arr">›</span></button>
+        <button type="button" data-faq="missed">I missed a day — what happens? <span class="arr">›</span></button>
+        <button type="button" data-faq="free">Is ABTalks really free? <span class="arr">›</span></button>
+      </div>
+      <a class="btn btn-primary btn-sm" href="mailto:support@abtalks.dev" style="width:100%;">Email support@abtalks.dev</a>
+    </div>`;
+
+  document.body.appendChild(fab);
+  document.body.appendChild(backdrop);
+
+  const FAQ_ANSWERS = {
+    submit: "Open today's task from your dashboard, then paste your GitHub commit link and your LinkedIn post link on that day's page — both are required.",
+    missed: "Your streak resets to 0, but your longest streak stays on record, and every student has a streak freeze to protect one missed day.",
+    free: "Yes — the full 60-day challenge is free, no card required."
+  };
+
+  function open() { backdrop.classList.add("show"); }
+  function close() { backdrop.classList.remove("show"); }
+
+  fab.addEventListener("click", open);
+  backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
+  backdrop.querySelector(".hp-close").addEventListener("click", close);
+  backdrop.querySelectorAll("[data-faq]").forEach(btn => {
+    btn.addEventListener("click", () => showToast(FAQ_ANSWERS[btn.dataset.faq]));
+  });
+}
+
+function showToast(msg) {
+  let t = document.querySelector(".toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.className = "toast";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => t.classList.add("show"));
+  clearTimeout(showToast._tid);
+  showToast._tid = setTimeout(() => t.classList.remove("show"), 2400);
+}
